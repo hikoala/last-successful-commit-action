@@ -31,6 +31,9 @@ const findSuccessfulWorkflowsByTagAndTagPattern = async (workflowId, currentTag,
         per_page: 100,
     });
 
+    core.info(`findSuccessfulWorkflowsByTagAndTagPattern parameters: "${currentTag}" "${tagPattern}"`)
+    core.info(`Number of workflows founds: ${workflowRuns.length}`);
+
     const { head_commit: { id = '' } = {} } =
         workflowRuns.find(({ head_branch }) => matcher.test(head_branch) && head_branch !== currentTag)
 
@@ -60,11 +63,17 @@ const findSuccessfulWorkflowByBranch = async (workflowId, branch) => {
         const tagPattern = core.getInput('tag_pattern');
         const workflowId = core.getInput('workflow_id');
 
+        core.info(`Actions params: "${currentTag}" "${tagPattern}"`);
+
         if (currentTag && tagPattern) {
             return core.setOutput('commit_hash', await findSuccessfulWorkflowsByTagAndTagPattern(workflowId, currentTag, tagPattern));
         }
 
-        core.setOutput('commit_hash', await findSuccessfulWorkflowByBranch(workflowId, branch));
+        if (branch) {
+            return core.setOutput('commit_hash', await findSuccessfulWorkflowByBranch(workflowId, branch));
+        }
+
+        return core.setOutput('commit_hash', '');
     } catch (e) {
         core.setFailed(e.message);
     }

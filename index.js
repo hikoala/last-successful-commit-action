@@ -24,6 +24,9 @@ const findSuccessfulWorkflowsByTagAndTagPattern = async (workflowId, currentTag,
         per_page: 100,
     });
 
+    core.info(`findSuccessfulWorkflowsByTagAndTagPattern parameters: "${currentTag}" "${tagPattern}"`)
+    core.info(`Number of workflows founds: ${workflowRuns.length}`);
+
     const { head_commit: { id = '' } = {} } =
         workflowRuns.find(({ head_branch }) => matcher.test(head_branch) && head_branch !== currentTag)
 

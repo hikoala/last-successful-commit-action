@@ -56,6 +56,8 @@ const findSuccessfulWorkflowByBranch = async (workflowId, branch) => {
         const tagPattern = core.getInput('tag_pattern');
         const workflowId = core.getInput('workflow_id');
 
+        core.info(`Actions params: "${currentTag}" "${tagPattern}"`);
+
         if (currentTag && tagPattern) {
             return core.setOutput('commit_hash', await findSuccessfulWorkflowsByTagAndTagPattern(workflowId, currentTag, tagPattern));
         }

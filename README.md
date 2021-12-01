@@ -25,11 +25,17 @@ Branch to get last successful commit from.
 
 **Required** ID or filename of the workflow (e.g. `deploy.yml`).
 
-### `event`
+### `tag_pattern`
 
-Event that triggered the workflow (e.g. `workflow_call`, `pull_request`).
+If `tag_pattern` is provided, the action will return the commit hash associated with 
+the last successful workflow that was triggered by a tag push matching this pattern. 
+The pattern must be compatible with JavaScript RegExp constructor (e.g. `v.*`).  
 
-**Default**: `push`
+If `tag_pattern` is provided, `branch` will be ignored.
+
+### `current_tag`
+
+Tag to exclude (e.g. `v1.1.2`). Used in conjunction with `tag_pattern`.
 
 ## Outputs
 

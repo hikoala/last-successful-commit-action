@@ -3,7 +3,7 @@ description: 'Get the commit hash of the last successful workflow run on a given
 inputs:
   branch:  # branch to analyze
     description: 'Branch to get last successful commit from'
-    required: true
+    required: false
     default: 'main'
   github_token:  # github token to use
     description: 'Your GitHub access token'
@@ -11,6 +11,12 @@ inputs:
   workflow_id:  # ID or filename of the workflow
     description: 'ID or filename of the workflow'
     required: true
+  tag_pattern:
+    description: 'Tag pattern to filter on'
+    required: false
+  current_tag:
+    description: 'The current tag associated with the commit if it exists'
+    required: false
 outputs:
   commit_hash: # hash of the last successful workflow run
     description: 'Last successful commit'

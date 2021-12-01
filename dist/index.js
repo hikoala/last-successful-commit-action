@@ -8,31 +8,67 @@ module.exports =
 const core = __webpack_require__(186);
 const github = __webpack_require__(438);
 
-try {
-  const octokit = github.getOctokit(core.getInput("github_token"));
-  const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
-  octokit.actions
-    .listWorkflowRuns({
-      owner,
-      repo,
-      workflow_id: core.getInput("workflow_id"),
-      status: "success",
-      branch: core.getInput("branch"),
-      event: "push",
-    })
-    .then((res) => {
-      const lastSuccessCommitHash =
-        res.data.workflow_runs.length > 0
-          ? res.data.workflow_runs[0].head_commit.id
-          : "";
-      core.setOutput("commit_hash", lastSuccessCommitHash);
-    })
-    .catch((e) => {
-      core.setFailed(e.message);
+const listWorkflowRuns = async (filters) => {
+    const octokit = github.getOctokit(core.getInput('github_token'));
+    const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
+
+    const { data: { workflow_runs = [] } } = await octokit.actions
+        .listWorkflowRuns({
+            owner,
+            repo,
+            ...filters,
+        });
+
+    return workflow_runs;
+};
+
+const findSuccessfulWorkflowsByTagAndTagPattern = async (workflowId, currentTag, tagPattern) => {
+    const matcher = new RegExp(tagPattern);
+    const workflowRuns = await listWorkflowRuns({
+        workflow_id: workflowId,
+        event: 'push',
+        status: 'success',
+        per_page: 100,
     });
-} catch (e) {
-  core.setFailed(e.message);
+
+    const { head_commit: { id = '' } = {} } =
+        workflowRuns.find(({ head_branch }) => matcher.test(head_branch) && head_branch !== currentTag)
+
+    return id;
 }
+
+const findSuccessfulWorkflowByBranch = async (workflowId, branch) => {
+    const workflowRuns = await listWorkflowRuns({
+        workflow_id: workflowId,
+        branch,
+        event: 'push',
+        status: 'success',
+        per_page: 1,
+    });
+
+    if (workflowRuns.length > 0) {
+        return workflowRuns[0].head_commit.id;
+    }
+
+    return '';
+}
+
+(async () => {
+    try {
+        const branch = core.getInput('branch');
+        const currentTag = core.getInput('current_tag');
+        const tagPattern = core.getInput('tag_pattern');
+        const workflowId = core.getInput('workflow_id');
+
+        if (currentTag && tagPattern) {
+            return core.setOutput('commit_hash', await findSuccessfulWorkflowsByTagAndTagPattern(workflowId, currentTag, tagPattern));
+        }
+
+        core.setOutput('commit_hash', await findSuccessfulWorkflowByBranch(workflowId, branch));
+    } catch (e) {
+        core.setFailed(e.message);
+    }
+})();
 
 
 /***/ }),

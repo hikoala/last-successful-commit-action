@@ -13,7 +13,8 @@ why this would be useful.
 
 ### `branch`
 
-**Required** Branch to get last successful commit from.
+Branch to get last successful commit from.
+
 **Default**: `main`
 
 ### `github_token`
@@ -23,6 +24,12 @@ why this would be useful.
 ### `workflow_id`
 
 **Required** ID or filename of the workflow (e.g. `deploy.yml`).
+
+### `event`
+
+Event that triggered the workflow (e.g. `workflow_call`, `pull_request`).
+
+**Default**: `push`
 
 ## Outputs
 

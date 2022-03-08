@@ -16,7 +16,7 @@ const listWorkflowRuns = async (filters) => {
 };
 
 const findSuccessfulWorkflowsByTagAndTagPattern = async (workflowId, currentTag, tagPattern) => {
-    const matcher = new RegExp(tagPattern);
+    const matcher = new RegExp(`^${tagPattern}$`);
     const workflowRuns = await listWorkflowRuns({
         workflow_id: workflowId,
         event: 'push',

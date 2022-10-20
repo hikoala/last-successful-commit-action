@@ -54,14 +54,14 @@ const findSuccessfulWorkflowByBranch = async (workflowId, branch) => {
         const workflowId = core.getInput('workflow_id');
 
         if (currentTag && tagPattern) {
-            return core.setOutput('commit_hash', await findSuccessfulWorkflowsByTagAndTagPattern(workflowId, currentTag, tagPattern));
+            return core.exportVariable('commit_hash', await findSuccessfulWorkflowsByTagAndTagPattern(workflowId, currentTag, tagPattern));
         }
 
         if (branch) {
-            return core.setOutput('commit_hash', await findSuccessfulWorkflowByBranch(workflowId, branch));
+            return core.exportVariable('commit_hash', await findSuccessfulWorkflowByBranch(workflowId, branch));
         }
 
-        return core.setOutput('commit_hash', '');
+        return core.exportVariable('commit_hash', '');
     } catch (e) {
         core.setFailed(e.message);
     }

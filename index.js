@@ -15,19 +15,49 @@ const listWorkflowRuns = async (filters) => {
     return workflow_runs;
 };
 
+async function* paginateWorkflowRuns(filters) {
+    const octokit = github.getOctokit(core.getInput('github_token'));
+    const [owner, repo] = ['hikoala', 'monorepo'];
+
+    let page = 1;
+    let hasMorePages = true;
+
+    while (hasMorePages) {
+        const { data: { workflow_runs = [], total_count } } = await octokit.actions.listWorkflowRuns({
+            owner,
+            repo,
+            page,
+            per_page: 100,
+            ...filters,
+        });
+
+        yield workflow_runs;
+
+        if (workflow_runs.length < 100 || page * 100 >= total_count) {
+            hasMorePages = false;
+        } else {
+            page++;
+        }
+    }
+}
+
 const findSuccessfulWorkflowsByTagAndTagPattern = async (workflowId, currentTag, tagPattern) => {
     const matcher = new RegExp(`^${tagPattern}$`);
-    const workflowRuns = await listWorkflowRuns({
+    const filters = {
         workflow_id: workflowId,
         event: 'push',
         status: 'success',
-        per_page: 100,
-    });
+    };
 
-    const { head_commit: { id = '' } = {} } =
-        workflowRuns.find(({ head_branch }) => matcher.test(head_branch) && head_branch !== currentTag)
+    for await (const workflowRuns of paginateWorkflowRuns(filters)) {
+        const match = workflowRuns.find(({ head_branch }) => matcher.test(head_branch) && head_branch !== currentTag);
 
-    return id;
+        if (match) {
+            return match.head_commit?.id || '';
+        }
+    }
+
+    return '';
 }
 
 const findSuccessfulWorkflowByBranch = async (workflowId, branch) => {

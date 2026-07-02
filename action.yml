@@ -5,7 +5,7 @@ inputs:
     description: 'Branch to get last successful commit from'
     required: false
     default: 'main'
-  github_token:  # github token to use
+  github_token:  # GitHub token to use
     description: 'Your GitHub access token'
     required: true
   workflow_id:  # ID or filename of the workflow
@@ -21,5 +21,5 @@ outputs:
   commit_hash: # hash of the last successful workflow run
     description: 'Last successful commit'
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'

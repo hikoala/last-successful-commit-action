@@ -1,12 +1,12 @@
-# "Last successful commit" action
+# "Last successful commit" GitHub Action
 
-This action returns the commit hash when a given workflow was last successful.
+This GitHub Action returns the commit hash of the last time a given workflow ran successfully.
 
 This is especially useful when we have a workflow where we need to know what changed
 in on a given branch between two commits, so we can run some tasks on those
 changes.
 
-Scroll down to the **Background** section below for more info around 
+Scroll down to the **Background** section below for more info around
 why this would be useful.
 
 ## Inputs
@@ -27,9 +27,9 @@ Branch to get last successful commit from.
 
 ### `tag_pattern`
 
-If `tag_pattern` is provided, the action will return the commit hash associated with 
-the last successful workflow that was triggered by a tag push matching this pattern. 
-The pattern must be compatible with JavaScript RegExp constructor (e.g. `v.*`).  
+If `tag_pattern` is provided, the action will return the commit hash associated with
+the last successful workflow that was triggered by a tag push matching this pattern.
+The pattern must be compatible with JavaScript RegExp constructor (e.g. `v.*`).
 
 If `tag_pattern` is provided, `branch` will be ignored.
 
@@ -77,13 +77,13 @@ between those 2 commits](https://nx.dev/latest/angular/tutorial/11-test-affected
 ). We can then run a set of tasks (like building or linting) only
 on those **affected** projects.
 
-This makes it easy to set-up a CI system that scales really well with the
-continous growth of your repository, as you add more and more projects.
-
+This makes it easy to set up a CI system that scales really well with the
+continuous growth of your repository, as you add more and more projects.
 
 ### Problem
 
-On a CI system that runs on submitted PRs, it's easy to determine what commits to include in the **affected** calculation:
+On a CI system that runs on submitted PRs, it's easy to determine what commits to include in the **affected**
+calculation:
 everything between latest `origin/master` and `HEAD-commit-of-my-PRs-branch`.
 As that includes all the changes our PR will introduce to `master`.
 
